@@ -1,6 +1,5 @@
 # TLV Box Voice Chat
 
-## What's it?
 Simply put, it's just a wrapper around LLM's streaming simulating voice conversation: User's voice -> s2t -> LLM -> t2s -> Marque.
 
 ### 1. User's voice -> s2t

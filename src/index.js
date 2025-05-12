@@ -66,7 +66,7 @@ app.get('/chat_events', async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders(); // send headers
 
-    res.write(`data: My answer: XXX\n\n`);
+    // res.write(`data: My answer: XXX\n\n`);
 
     try {
             // const sendEvent = (data) => {
@@ -81,15 +81,15 @@ app.get('/chat_events', async (req, res) => {
             // }, 1000);
             
             const { response, stream } = ai.generateStream({
-                prompt: req.session.prompt
+                prompt: req.session.prompt,
+                config: {
+                    temperature: 0.8, // 🔥 Control creativity here
+                }                
             });
       
             for await (const chunk of stream) {
                 const textContent = chunk.text || '';
                 logger.debug(textContent);
-
-                const timestamp = new Date().toISOString();
-                logger.debug(`Server time: ${timestamp}`);
 
                 res.write(`data: ${textContent}\n\n`);
             }
@@ -97,7 +97,7 @@ app.get('/chat_events', async (req, res) => {
             // console.log((await response).text);
 
             req.on('close', () => {
-                clearInterval(intervalId);
+                // clearInterval(intervalId);
                 res.end();
             })            
 

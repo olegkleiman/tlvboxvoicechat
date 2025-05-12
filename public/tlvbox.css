@@ -30,21 +30,20 @@ body {
 
 #ticker-container {
     width: 100%;
+    max-width: 100%;
+    height: 40px;
+    /* border: 2px solid #333; */
+    background: #fff;
     overflow: hidden;
-    background: white;
-    color: black; 
-    white-space: nowrap;
     position: relative;
-    height: 2em;
-    font-family: monospace;
-}
+  }
 
-.ticker-message {
-    display: inline-block;
-    padding-left: 100%;
-    animation: scroll-left 10s linear;
-}
-
+  #ticker {
+    position: absolute;
+    white-space: nowrap;
+    left: 100%;
+  }
+  
 @keyframes scroll-left {
     from { transform: translateX(100%); }
     to { transform: translateX(-100%); }
@@ -52,6 +51,7 @@ body {
 
 @keyframes flowLeft {
     0%   { transform: translateX(100%); }
+    50% { transform: translate(0, 0); }
     -100% { transform: translateX(-100%); }
 }
 

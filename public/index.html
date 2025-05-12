@@ -32,8 +32,9 @@
             <div id="state_lbl"></div>
         </div>
 
-        <!-- <div id="answer_text" class="flow-text">ddd</div> -->
-        <div id="ticker-container">Empty</div>
+        <div id="ticker-container">
+            <div id="ticker"></div>
+        </div>
 
         <button onclick="onStopAnimation()">Start Speaking</button>
         <button onclick="startAnimation()">Your turn</button>
@@ -42,8 +43,7 @@
 
             const text = "Hello, this is a my answer shown in typewriter effect!";
             const player = document.getElementById("lottiePlayer");
-            //const typewriter = document.getElementById("answer_text");
-            const ticker = document.getElementById('ticker-container');
+            const ticker = document.getElementById('ticker');
 
             function onStopAnimation() { // User start speaking
 
@@ -60,7 +60,6 @@
                 document.getElementById("state_lbl").innerHTML = message;
 
                 player.play();
-                //typewriter.innerText = text;
 
                 // Initialie the session with the server.
                 // It is used for authentication and parameters(prompt) passing
@@ -75,24 +74,34 @@
                         prompt: "How does the lunar surface look?"
                     })    
                 })
-                const ticker = document.getElementById('ticker-container');
+
+                let position = window.innerWidth;
+                let content = '';
 
                 const eventSource = new EventSource("./chat_events");
                 eventSource.onmessage = (event) => {
-                    // typewriter.innerText += event.data;
-                    // console.log(typewriter.innerText);
-
-                    const msg = document.createElement('div');
-                    msg.className = 'ticker-message';
-                    msg.innerText = event.data;
-
-                    ticker.appendChild(msg);
-
-                    // Remove the message after it finishes scrolling
-                    msg.addEventListener('animationend', () => {
-                        ticker.removeChild(msg);
-                    });
+                    content += event.data;
+                    ticker.textContent = content;
                 }
+
+                eventSource.addEventListener('end', () => {
+                    eventSource.close();
+                    ticker.textContent = content;
+                });
+            
+                function animate() {
+                    position -= 1; // speed (px/frame)
+                    ticker.style.left = position + 'px';
+
+                    // Reset position when completely out of view
+                    if (ticker.getBoundingClientRect().right < 0) {
+                        position = window.innerWidth;
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+                
+                animate()
             }
 
 

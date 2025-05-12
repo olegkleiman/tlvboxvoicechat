@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SSE Typing Animation</title>
+  <style>
+    body {
+      font-family: monospace;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    #output {
+      border: 1px solid #ccc;
+      padding: 16px;
+      background: white;
+      width: 600px;
+      min-height: 200px;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50%, 100% { background-color: black; }
+      25%, 75% { background-color: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <h1>SSE Typing Animation</h1>
+  <div id="output"><span id="text"></span><span class="cursor">&nbsp;</span></div>
+
+  <script>
+    const textEl = document.getElementById('text');
+    const eventSource = new EventSource('./chat_events');
+
+    let queue = [];
+    let typing = false;
+
+    function typeText() {
+      if (typing || queue.length === 0) return;
+      typing = true;
+
+      const text = queue.shift();
+      let i = 0;
+
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          textEl.textContent += text.charAt(i++);
+        } else {
+          textEl.textContent += '\n';
+          typing = false;
+          clearInterval(interval);
+          typeText(); // Type next item in queue
+        }
+      }, 40); // Speed of typing
+    }
+
+    eventSource.onmessage = (event) => {
+      queue.push(event.data);
+      typeText();
+    };
+
+    eventSource.addEventListener('end', () => {
+      eventSource.close();
+      queue.push("\n[Stream ended]");
+      typeText();
+    });
+  </script>
+</body>
+</html>

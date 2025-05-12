@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 
 import { ai } from './genkit.js';
 import { logger } from 'genkit/logging';
-// import { googleAI } from '@genkit-ai/googleai';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -35,14 +34,16 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-app.post('/init', (req, res) => {
+app.post('/init', async (req, res) => {
     logger.debug('Session before /init:', req.sessionID, req.session);
 
     const data = req.body;
-    logger.debug('Received JSON in /init:', data);
+    const question = data.question;
 
-    const prompt = data.prompt;
-    req.session.prompt = prompt;
+    const prompt = ai.prompt('tools_agent'); // '.prompt' extension will be added automatically
+    const renderedPrompt = await prompt.render( { input: question } );
+
+    req.session.prompt = renderedPrompt;
     logger.debug(req.session.prompt);
     
     res.status(200).json({ message: 'Prompt received' })
@@ -66,24 +67,12 @@ app.get('/chat_events', async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders(); // send headers
 
-    // res.write(`data: My answer: XXX\n\n`);
-
     try {
-            // const sendEvent = (data) => {
-            //     res.write(`data: ${JSON.stringify(data)}\n\n`);
-            // };
-
-            // // Send a message every 1 seconds
-            // const intervalId = setInterval(() => {
-            //     const timestamp = new Date().toISOString();
-            //     logger.debug(`Server time: ${timestamp}`);
-            //     sendEvent({ message: `Server time: ${timestamp}` });
-            // }, 1000);
-            
+            const prompt = req.session.prompt;
             const { response, stream } = ai.generateStream({
-                prompt: req.session.prompt,
+                messages: prompt.messages,
                 config: {
-                    temperature: 0.8, // 🔥 Control creativity here
+                    temperature: 0.8
                 }                
             });
       
@@ -97,7 +86,6 @@ app.get('/chat_events', async (req, res) => {
             // console.log((await response).text);
 
             req.on('close', () => {
-                // clearInterval(intervalId);
                 res.end();
             })            
 

@@ -28,6 +28,19 @@ body {
     animation: flowLeft 2s linear infinite;
 }
 
+.icon-control {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.icon-control img {
+    width: 56x; /* Adjust size as needed */
+    height: 56px;
+    /* border-radius: 50%;  */
+  }
+
 #ticker-container {
     width: 100%;
     max-width: 100%;

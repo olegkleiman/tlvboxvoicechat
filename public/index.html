@@ -36,8 +36,12 @@
             <div id="ticker"></div>
         </div>
 
-        <button onclick="onStopAnimation()">Start Speaking</button>
-        <button onclick="startAnimation()">Your turn</button>
+        <button class="icon-control"  onclick="startSpeak()">
+            <img src="./img/mic_gray.png" />
+        </button>
+        <button class="icon-control" onclick="turnConversation()">
+            <img src="./img/start.png" />
+        </button>
 
         <script>
 
@@ -45,7 +49,7 @@
             const player = document.getElementById("lottiePlayer");
             const ticker = document.getElementById('ticker');
 
-            function onStopAnimation() { // User start speaking
+            function startSpeak() { // User start speaking
 
                 const message = "I'm listening";
                 document.getElementById("state_lbl").innerHTML = message;
@@ -54,7 +58,7 @@
                 typewriter.innerText = ""
             }
 
-            function startAnimation() { 
+            function turnConversation() { 
 
                 const message = "I'm speaking";
                 document.getElementById("state_lbl").innerHTML = message;

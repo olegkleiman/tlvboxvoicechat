@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />        
+        <meta charset="UTF-8" />
+
+        <title>TLV Box</title>
+
+        <link rel="stylesheet" href="./tlvbox.css">
+
+        <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+
+    </head>
+    <body>
+        <div class="player-container">
+            <dotlottie-player
+                id="lottiePlayer"
+                src="https://lottie.host/c0622812-ac4e-4a2f-8678-0f4165553f2f/NAFkq6Fe5M.lottie"
+                background="transparent"
+                speed="1"
+                style="width: 300px; height: 300px"
+                loop
+                autoplay>
+
+            </dotlottie-player>
+        </div>
+
+        <div class="state-container">
+            <div id="state_lbl"></div>
+        </div>
+
+        <!-- <div id="answer_text" class="flow-text">ddd</div> -->
+        <div id="ticker-container">Empty</div>
+
+        <button onclick="onStopAnimation()">Start Speaking</button>
+        <button onclick="startAnimation()">Your turn</button>
+
+        <script>
+
+            const text = "Hello, this is a my answer shown in typewriter effect!";
+            const player = document.getElementById("lottiePlayer");
+            //const typewriter = document.getElementById("answer_text");
+            const ticker = document.getElementById('ticker-container');
+
+            function onStopAnimation() { // User start speaking
+
+                const message = "I'm listening";
+                document.getElementById("state_lbl").innerHTML = message;
+
+                player.stop();
+                typewriter.innerText = ""
+            }
+
+            function startAnimation() { 
+
+                const message = "I'm speaking";
+                document.getElementById("state_lbl").innerHTML = message;
+
+                player.play();
+                //typewriter.innerText = text;
+
+                // Initialie the session with the server.
+                // It is used for authentication and parameters(prompt) passing
+                fetch('/init', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // TBD: Set authorization header
+                    },
+                    body: JSON.stringify({
+                        userId: "123456789",
+                        prompt: "How does the lunar surface look?"
+                    })    
+                })
+                const ticker = document.getElementById('ticker-container');
+
+                const eventSource = new EventSource("./chat_events");
+                eventSource.onmessage = (event) => {
+                    // typewriter.innerText += event.data;
+                    // console.log(typewriter.innerText);
+
+                    const msg = document.createElement('div');
+                    msg.className = 'ticker-message';
+                    msg.innerText = event.data;
+
+                    ticker.appendChild(msg);
+
+                    // Remove the message after it finishes scrolling
+                    msg.addEventListener('animationend', () => {
+                        ticker.removeChild(msg);
+                    });
+                }
+            }
+
+
+        </script>
+    </body>
+</html>        

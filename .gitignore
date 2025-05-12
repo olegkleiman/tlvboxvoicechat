@@ -1,0 +1,5 @@
+node_modules
+public/bundle.js*
+__*__
+__*__.json
+.DS_Store

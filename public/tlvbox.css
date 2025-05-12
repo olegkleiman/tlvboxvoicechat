@@ -1,0 +1,58 @@
+:root {
+    --primary: #46a6ff;
+    --warning: #ff9f15;
+}
+
+body {
+    font-size: 18px;
+    font-family: Montserrat;
+}
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+    
+.flow-text {
+    position: relative;
+    white-space: nowrap;
+    font-size: 1.5rem;
+    animation: flowLeft 2s linear infinite;
+}
+
+#ticker-container {
+    width: 100%;
+    overflow: hidden;
+    background: white;
+    color: black; 
+    white-space: nowrap;
+    position: relative;
+    height: 2em;
+    font-family: monospace;
+}
+
+.ticker-message {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 10s linear;
+}
+
+@keyframes scroll-left {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}  
+
+@keyframes flowLeft {
+    0%   { transform: translateX(100%); }
+    -100% { transform: translateX(-100%); }
+}
+
+/* Change -100% and 100% to reverse direction (right to left, etc.) */

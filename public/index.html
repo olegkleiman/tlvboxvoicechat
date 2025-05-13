@@ -7,11 +7,12 @@
         <meta http-equiv="Expires" content="0" />        
         <meta charset="UTF-8" />
 
-        <title>TLV Box</title>
+        <title>TLV Vioce Box</title>
 
         <link rel="stylesheet" href="./tlvbox.css">
 
         <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+        <script src="./scripts/audioEngine.js"></script>
 
     </head>
     <body>
@@ -36,15 +37,27 @@
             <div id="ticker"></div>
         </div>
 
-        <button class="icon-control"  onclick="startSpeak()">
+        <button id="start_img" class="icon-control"  onclick="startSpeak()">
             <img src="./img/mic_gray.png" />
         </button>
         <button class="icon-control" onclick="turnConversation()">
             <img src="./img/start.png" />
         </button>
 
+
         <script>
 
+const recogniztion_started = () => {
+                start_img.src = 'https://www.google.com/intl/en/chrome/assets/common/images/content/mic-animate.gif';
+            }
+            const recognition_ended = () => {
+                start_img.src = 'https://www.google.com/intl/en/chrome/assets/common/images/content/mic.gif';
+            }
+            const recornition_result = (transcript) => {
+                start_img.src = 'https://www.google.com/intl/en/chrome/assets/common/images/content/mic.gif';
+            }
+            const audioEngine = new AudioEngine('en', recogniztion_started, recognition_ended, recornition_result);
+    
             const text = "Hello, this is a my answer shown in typewriter effect!";
             const player = document.getElementById("lottiePlayer");
             const ticker = document.getElementById('ticker');
@@ -84,6 +97,13 @@
 
                 const eventSource = new EventSource("./chat_events");
                 eventSource.onmessage = (event) => {
+                    // audioEngine.speak(event.data);
+
+                    const utterance = new SpeechSynthesisUtterance(event.data);
+                    const voices = speechSynthesis.getVoices();
+                    utterance.voice = voices.find(voice => voice.name.includes("Aaron") ) //"Google UK English Female");
+                    speechSynthesis.speak(utterance);
+
                     content += event.data;
                     ticker.textContent = content;
                 }

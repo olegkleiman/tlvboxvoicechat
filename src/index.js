@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import { ai } from './genkit.js';
+import { ai, SearchFlow, IndexFlow } from './genkit.js';
 import { logger } from 'genkit/logging';
 
 import dotenv from 'dotenv';
@@ -44,8 +44,9 @@ app.post('/init', async (req, res) => {
     const renderedPrompt = await prompt.render( { input: question } );
 
     req.session.prompt = renderedPrompt;
-    logger.debug(req.session.prompt);
-    
+    req.session.query = question;
+    logger.debug(`Prompt: ${req.session.prompt}, Query: ${res.session.query}`);
+ 
     res.status(200).json({ message: 'Prompt received' })
 })
 
@@ -69,6 +70,11 @@ app.get('/chat_events', async (req, res) => {
 
     try {
             const prompt = req.session.prompt;
+            const query = req.session.query;
+            
+            // Run SearchFlow - RAG step
+            const docs = await SearchFlow(query);
+            
             const { response, stream } = ai.generateStream({
                 messages: prompt.messages,
                 config: {
@@ -92,8 +98,15 @@ app.get('/chat_events', async (req, res) => {
         } catch (error) {
             logger.error(error)
         }
+})
 
+app.put('/index', async (req, res) => {
 
+    const body = req.body;
+    const path = body.path;
+    await IndexFlow(path);
+
+    res.status(200)
 })
 
 const PORT = process.env.PORT || 8089;

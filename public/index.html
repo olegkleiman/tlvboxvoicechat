@@ -37,17 +37,21 @@
             <div id="ticker"></div>
         </div>
 
-        <button id="start_img" class="icon-control"  onclick="startSpeak()">
-            <img src="./img/mic_gray.png" />
+        <button class="icon-control"  onclick="startSpeak()">
+            <img id="start_img" src="https://www.google.com/intl/en/chrome/assets/common/images/content/mic.gif" />
         </button>
         <button class="icon-control" onclick="turnConversation()">
-            <img src="./img/start.png" />
+            <img src="./img/start.png"/>
         </button>
-
 
         <script>
 
-const recogniztion_started = () => {
+            const text = "Hello, this is a my answer shown in typewriter effect!";
+            const player = document.getElementById("lottiePlayer");
+            const ticker = document.getElementById('ticker');
+            const state = document.getElementById("state_lbl");
+
+            const recogniztion_started = () => {
                 start_img.src = 'https://www.google.com/intl/en/chrome/assets/common/images/content/mic-animate.gif';
             }
             const recognition_ended = () => {
@@ -55,20 +59,15 @@ const recogniztion_started = () => {
             }
             const recornition_result = (transcript) => {
                 start_img.src = 'https://www.google.com/intl/en/chrome/assets/common/images/content/mic.gif';
+                state.innerHTML = transcript;
             }
             const audioEngine = new AudioEngine('en', recogniztion_started, recognition_ended, recornition_result);
-    
-            const text = "Hello, this is a my answer shown in typewriter effect!";
-            const player = document.getElementById("lottiePlayer");
-            const ticker = document.getElementById('ticker');
 
             function startSpeak() { // User start speaking
-
-                const message = "I'm listening";
-                document.getElementById("state_lbl").innerHTML = message;
+                state.innerHTML = "I'm listening";
 
                 player.stop();
-                typewriter.innerText = ""
+                audioEngine.startRecognition()
             }
 
             function turnConversation() { 
@@ -88,7 +87,7 @@ const recogniztion_started = () => {
                     },
                     body: JSON.stringify({
                         userId: "123456789",
-                        question: "How does the lunar surface look?"
+                        question: "Who is Pozzo?" // "How does the lunar surface look?"
                     })    
                 })
 

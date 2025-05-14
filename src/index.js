@@ -40,12 +40,12 @@ app.post('/init', async (req, res) => {
     const data = req.body;
     const question = data.question;
 
-    const prompt = ai.prompt('tools_agent'); // '.prompt' extension will be added automatically
+    const prompt = ai.prompt('general_agent'); // '.prompt' extension will be added automatically
     const renderedPrompt = await prompt.render( { input: question } );
 
     req.session.prompt = renderedPrompt;
     req.session.query = question;
-    logger.debug(`Prompt: ${req.session.prompt}, Query: ${res.session.query}`);
+    logger.debug(`Prompt: ${JSON.stringify(req.session.prompt)}\n Query: ${req.session.query}`);
  
     res.status(200).json({ message: 'Prompt received' })
 })
@@ -73,10 +73,13 @@ app.get('/chat_events', async (req, res) => {
             const query = req.session.query;
             
             // Run SearchFlow - RAG step
-            const docs = await SearchFlow(query);
+            const finalPrompt = await SearchFlow(query);
             
             const { response, stream } = ai.generateStream({
                 messages: prompt.messages,
+                prompt: [
+                    { text: finalPrompt }
+                ],
                 config: {
                     temperature: 0.8
                 }                
@@ -86,10 +89,10 @@ app.get('/chat_events', async (req, res) => {
                 const textContent = chunk.text || '';
                 logger.debug(textContent);
 
-                res.write(`data: ${textContent}\n\n`);
+                res.write(`event:message\ndata: ${textContent}\n\n`);
             }
 
-            // console.log((await response).text);
+            logger.debug((await response).text);
 
             req.on('close', () => {
                 res.end();
@@ -104,9 +107,11 @@ app.put('/index', async (req, res) => {
 
     const body = req.body;
     const path = body.path;
+    if( !path )
+        return res.status(400).json({ message: "Missing 'path' in request body."})
     await IndexFlow(path);
 
-    res.status(200)
+    res.status(200).send()
 })
 
 const PORT = process.env.PORT || 8089;

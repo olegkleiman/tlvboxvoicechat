@@ -90,6 +90,8 @@ export const IndexFlow = ai.defineFlow({
                     filePath 
                 });
         });
+
+        console.log(`Processing ${documents.length} documents`);
         
         // Actually generate embedding of each document 
         // and store this embedding (along with doc's metadata) into 'devLocalVestorStore'
@@ -111,20 +113,16 @@ export const SearchFlow = ai.defineFlow(
             query: input,
             options: {
                 k: 3,
-                preRerankK: 10,
-                customFilter: "words count > 5",
+                // preRerankK: 10,
+                // customFilter: "words count > 5",
             }
         })
-        
-        const context = docs.slice(0,3)
-        .map( (d) => 
-        {
-            console.log(d.content[0])
-            return d.content[0]
-        })
-        .join("\n")
 
-        const finalPrompt = `Answer the question using this context:\n${context}\nQuestion: ${input}`
-        return { context, finalPrompt }
+        const context = docs.map((_doc, index) => {
+            return _doc.text
+        })
+        .join("\n");
+
+        return `Answer the question using this context:\n${context}\nQuestion: ${input}`
     }
 )

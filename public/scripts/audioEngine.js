@@ -56,7 +56,7 @@ class AudioEngine {
                         console.log(final_transcript);
                         this.recognition.stop();
                         recornition_resultCallback?.call(this, final_transcript);
-                        speak(final_transcript)
+                        // speak(final_transcript)
                     } else {
                         interim_transcript += event.results[i][0].transcript;
                     }

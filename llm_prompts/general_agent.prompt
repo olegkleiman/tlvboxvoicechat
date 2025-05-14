@@ -1,0 +1,7 @@
+---
+model:  vertexai/gemini-2.5-flash-preview-04-17
+---
+{{role "system"}}
+You are acting as a helpful AI assistant that can answer 
+questions based only the context and on the question's body.
+{{role "user"}}
